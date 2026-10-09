@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "TimerPicto",
+    "slug": "timerpicto",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0b1b3d"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      ["expo-notifications", { "sounds": ["./assets/alarm.wav"] }]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.jorso.timerpicto",
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"]
+      }
+    },
+    "android": {
+      "package": "com.jorso.timerpicto",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0b1b3d"
+      }
+    }
+  }
+}

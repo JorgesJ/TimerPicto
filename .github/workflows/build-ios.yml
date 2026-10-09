@@ -1,0 +1,59 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Prebuild iOS
+        run: npx expo prebuild --platform ios --clean
+
+      - name: Patch fmt (Xcode compatibility)
+        run: |
+          if [ -f ios/Pods/fmt/include/fmt/format-inl.h ]; then
+            sed -i '' 's/FMT_STRING("\([^"]*\)")/"\1"/g' ios/Pods/fmt/include/fmt/format-inl.h
+          fi
+
+      - name: Install CocoaPods
+        run: cd ios && pod install && cd ..
+
+      - name: Build .app
+        run: |
+          xcodebuild \
+            -workspace ios/TimerPicto.xcworkspace \
+            -scheme TimerPicto \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            -quiet
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/Build/Products/Release-iphoneos/TimerPicto.app Payload/
+          zip -r TimerPicto.ipa Payload
+          rm -rf Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TimerPicto-IPA
+          path: TimerPicto.ipa
+          retention-days: 30

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -85,7 +85,15 @@ function Action({ text, color, enabled, onPress, flex }: ActionProps) {
 }
 
 function Timer() {
-  const { width, height, isLandscape, s } = useScale();
+  const { width: sw, height: sh, s } = useScale();
+  const [box, setBox] = useState<{ w: number; h: number } | null>(null);
+  const width = box ? box.w : sw;
+  const height = box ? box.h : sh;
+  const isLandscape = width > height;
+  const onBox = (e: LayoutChangeEvent) => {
+    const { width: w, height: h } = e.nativeEvent.layout;
+    setBox((p) => (p && p.w === w && p.h === h ? p : { w, h }));
+  };
   const insets = useSafeAreaInsets();
   const pad = s(16, isLandscape ? 24 : 28);
   const gap = s(10, 22);
@@ -215,7 +223,7 @@ function Timer() {
 
   if (isLandscape) {
     return (
-      <View style={[styles.fill, { flexDirection: 'row', paddingTop: pad, paddingHorizontal: pad, paddingBottom: pad, alignItems: 'center' }]}>
+      <View onLayout={onBox} style={[styles.fill, { flexDirection: 'row', paddingTop: pad, paddingHorizontal: pad, paddingBottom: pad, alignItems: 'center' }]}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>{ring}</View>
         <View style={{ flex: 1.1, justifyContent: 'space-around', alignItems: 'center', height: '100%', gap: s(12, 20) }}>
           {steppers}
@@ -226,7 +234,7 @@ function Timer() {
   }
 
   return (
-    <View style={[styles.fill, { paddingTop: pad, paddingHorizontal: pad, paddingBottom: pad, justifyContent: 'space-between', alignItems: 'center' }]}>
+    <View onLayout={onBox} style={[styles.fill, { paddingTop: pad, paddingHorizontal: pad, paddingBottom: pad, justifyContent: 'space-between', alignItems: 'center' }]}>
       {steppers}
       {ring}
       {actions}

@@ -79,7 +79,7 @@ function Action({ text, color, enabled, onPress, flex }: ActionProps) {
         flex ? { flex: 1 } : null,
       ]}
     >
-      <Text style={[styles.actionText, { fontSize: s(18, 26) }]}>{text}</Text>
+      <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.5} style={[styles.actionText, { fontSize: s(18, 26) }]}>{text}</Text>
     </Pressable>
   );
 }

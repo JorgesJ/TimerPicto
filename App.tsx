@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useScale } from './src/useScale';
 import { Ring } from './src/Ring';
@@ -23,13 +23,13 @@ type StepperProps = {
   label: string;
   value: number;
   max: number;
+  size: number;
   disabled: boolean;
   onChange: (v: number) => void;
 };
 
-function Stepper({ label, value, max, disabled, onChange }: StepperProps) {
-  const { s } = useScale();
-  const btn = s(44, 56);
+function Stepper({ label, value, max, size, disabled, onChange }: StepperProps) {
+  const btn = size;
   const dec = () => onChange(value <= 0 ? max : value - 1);
   const inc = () => onChange(value >= max ? 0 : value + 1);
   const round = {
@@ -40,14 +40,14 @@ function Stepper({ label, value, max, disabled, onChange }: StepperProps) {
   };
   return (
     <View style={{ alignItems: 'center' }}>
-      <Text style={[styles.label, { fontSize: s(16, 20) }]}>{label}</Text>
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: s(6, 8) }}>
+      <Text style={[styles.label, { fontSize: Math.max(12, Math.round(btn * 0.36)) }]}>{label}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: Math.round(btn * 0.12) }}>
         <Pressable disabled={disabled} onPress={dec} style={[styles.round, round]}>
-          <Text style={[styles.roundText, { fontSize: s(24, 30) }]}>−</Text>
+          <Text style={[styles.roundText, { fontSize: Math.round(btn * 0.55) }]}>−</Text>
         </Pressable>
-        <Text style={[styles.value, { fontSize: s(32, 44), minWidth: s(50, 68) }]}>{pad(value)}</Text>
+        <Text style={[styles.value, { fontSize: Math.round(btn * 0.75), minWidth: Math.round(btn * 1.3) }]}>{pad(value)}</Text>
         <Pressable disabled={disabled} onPress={inc} style={[styles.round, round]}>
-          <Text style={[styles.roundText, { fontSize: s(24, 30) }]}>+</Text>
+          <Text style={[styles.roundText, { fontSize: Math.round(btn * 0.55) }]}>+</Text>
         </Pressable>
       </View>
     </View>
@@ -86,6 +86,12 @@ function Action({ text, color, enabled, onPress, flex }: ActionProps) {
 
 function Timer() {
   const { width, height, isLandscape, s } = useScale();
+  const insets = useSafeAreaInsets();
+  const pad = s(16, isLandscape ? 24 : 28);
+  const gap = s(10, 22);
+  const bottomPad = Math.max(insets.bottom, 20) + s(10, 16);
+  const availW = isLandscape ? ((width - 2 * pad) * 1.1) / 2.1 : width - 2 * pad;
+  const stepSize = Math.floor(Math.min((availW - 2 * gap) / 3 / 3.3, s(44, 56)));
   const [h, setH] = useState(0);
   const [m, setM] = useState(5);
   const [sec, setSec] = useState(0);
@@ -172,10 +178,10 @@ function Timer() {
   const steppers = (
     <View style={{ alignItems: 'center' }}>
       <Text style={[styles.title, { fontSize: s(18, 24), marginBottom: s(8, 12) }]}>Ajusta el tiempo:</Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: s(10, 22) }}>
-        <Stepper label="Horas" value={h} max={23} disabled={locked} onChange={setH} />
-        <Stepper label="Minutos" value={m} max={59} disabled={locked} onChange={setM} />
-        <Stepper label="Segundos" value={sec} max={59} disabled={locked} onChange={setSec} />
+      <View style={{ flexDirection: 'row', justifyContent: 'center', gap }}>
+        <Stepper label="Horas" value={h} max={23} size={stepSize} disabled={locked} onChange={setH} />
+        <Stepper label="Minutos" value={m} max={59} size={stepSize} disabled={locked} onChange={setM} />
+        <Stepper label="Segundos" value={sec} max={59} size={stepSize} disabled={locked} onChange={setSec} />
       </View>
     </View>
   );
@@ -209,7 +215,7 @@ function Timer() {
 
   if (isLandscape) {
     return (
-      <View style={[styles.fill, { flexDirection: 'row', padding: s(16, 24), alignItems: 'center' }]}>
+      <View style={[styles.fill, { flexDirection: 'row', paddingTop: pad, paddingHorizontal: pad, paddingBottom: bottomPad, alignItems: 'center' }]}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>{ring}</View>
         <View style={{ flex: 1.1, justifyContent: 'space-around', alignItems: 'center', height: '100%', gap: s(12, 20) }}>
           {steppers}
@@ -220,7 +226,7 @@ function Timer() {
   }
 
   return (
-    <View style={[styles.fill, { padding: s(16, 28), justifyContent: 'space-between', alignItems: 'center' }]}>
+    <View style={[styles.fill, { paddingTop: pad, paddingHorizontal: pad, paddingBottom: bottomPad, justifyContent: 'space-between', alignItems: 'center' }]}>
       {steppers}
       {ring}
       {actions}

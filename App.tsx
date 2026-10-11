@@ -194,7 +194,7 @@ function Timer() {
   );
 
   const actions = (
-    <View style={{ flexDirection: 'row', gap: s(10, 16), width: '100%' }}>
+    <View style={{ flexDirection: 'row', gap: s(10, 16), width: '100%', paddingBottom: bottomPad }}>
       <Action
         text={status === 'paused' ? '▶ Reanudar' : '▶ Empezar'}
         color="#10b981"
@@ -215,7 +215,7 @@ function Timer() {
 
   if (isLandscape) {
     return (
-      <View style={[styles.fill, { flexDirection: 'row', paddingTop: pad, paddingHorizontal: pad, paddingBottom: bottomPad, alignItems: 'center' }]}>
+      <View style={[styles.fill, { flexDirection: 'row', paddingTop: pad, paddingHorizontal: pad, paddingBottom: pad, alignItems: 'center' }]}>
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>{ring}</View>
         <View style={{ flex: 1.1, justifyContent: 'space-around', alignItems: 'center', height: '100%', gap: s(12, 20) }}>
           {steppers}
@@ -226,7 +226,7 @@ function Timer() {
   }
 
   return (
-    <View style={[styles.fill, { paddingTop: pad, paddingHorizontal: pad, paddingBottom: bottomPad, justifyContent: 'space-between', alignItems: 'center' }]}>
+    <View style={[styles.fill, { paddingTop: pad, paddingHorizontal: pad, paddingBottom: pad, justifyContent: 'space-between', alignItems: 'center' }]}>
       {steppers}
       {ring}
       {actions}

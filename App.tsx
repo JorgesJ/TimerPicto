@@ -89,7 +89,7 @@ function Timer() {
   const insets = useSafeAreaInsets();
   const pad = s(16, isLandscape ? 24 : 28);
   const gap = s(10, 22);
-  const bottomPad = Math.max(insets.bottom, 20) + s(10, 16);
+  const bottomPad = Math.max(insets.bottom, 34) + s(24, 32);
   const availW = isLandscape ? ((width - 2 * pad) * 1.1) / 2.1 : width - 2 * pad;
   const stepSize = Math.floor(Math.min((availW - 2 * gap) / 3 / 3.3, s(44, 56)));
   const [h, setH] = useState(0);
